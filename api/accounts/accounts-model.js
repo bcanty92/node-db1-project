@@ -1,47 +1,46 @@
-const knex = require(knex);
-const config = {
-  client: "sqlite3",
-  connection: {
-    filename: ".../data/budget.db3",
-  },
-  useNullAsDefault: true,
-};
-
-const db = knex(config);
+const db = require('../../data/db-config');
 
 const getAll = () => {
-  return db("Accounts");
+  // DO YOUR MAGIC
+  return db('accounts');
+}
+
+const getById = id => {
+  // DO YOUR MAGIC
+  if (id) {
+    return db('accounts')
+      .where('id', id)
+      .first();
+  }
 };
 
-const getById = (id) => {
-  return db("Accounts").where("id", id).first();
-};
+const create = async account => {
+  // DO YOUR MAGIC
+  if (account) {
+    return db('accounts')
+      .insert(account)
+      .then(([id]) => getById(id))
+  }
+}
 
-const create = async (account) => {
-  return await db("Accounts")
-    .insert(account)
-    .then((id) => {
-      return db("Accounts").where("id", id).first();
-    });
-};
+const updateById = (id, account) => {
+  // DO YOUR MAGIC
+    if (id) {
+      return db('accounts')
+        .where('id', id)
+        .update(account)
+        .then((count) => (count > 0 ? getById(id) : null))
+    }
+}
 
-const updateById = async (id, account) => {
-  return await db("Accounts")
-    .where("id", id)
-    .update(account)
-    .then((id) => {
-      return db("Accounts").where("id", id).first();
-    });
-};
-
-const deleteById = async (id) => {
-  return await db("accounts")
-    .where("id", id)
+const deleteById = id => {
+  // DO YOUR MAGIC
+  if (id) {
+    return db('accounts')
+    .where('id', id)
     .del()
-    .then(() => {
-      return db("accounts");
-    });
-};
+  }
+}
 
 module.exports = {
   getAll,
@@ -49,4 +48,4 @@ module.exports = {
   create,
   updateById,
   deleteById,
-};
+}

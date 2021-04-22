@@ -1,71 +1,68 @@
-const router = require("express").Router();
-const {
-  CheckAccountPayload,
-  checkAccountNameUnique,
-  checkAccountId,
-  checkAccountPayload,
-} = require("./accounts-middleware");
-const model = require("./accounts-model");
-/*module.exports (accounts-model) = {
-  getAll,
-  getById,
-  create,
-  updateById,
-  deleteById,
-}*/
+const router = require('express').Router();
+const db = require('./accounts-model');
+const mw = require('./accounts-middleware');
 
-router.get("/", async (req, res, next) => {
+router.get('/', async (req, res, next) => {
+  // DO YOUR MAGIC
   try {
-    const account = await model.getAll;
+    const accounts = await db.getAll();
+    res.status(200).json(accounts);
+  }
+  catch (err) {
+    next(err);
+  }
+})
+
+router.get('/:id', mw.checkAccountId ,async (req, res, next) => {
+  // DO YOUR MAGIC
+  try {
+    const account = await db.getById(req.params.id);
     res.status(200).json(account);
-  } catch (err) {
+  }
+  catch(err) {
     next(err);
   }
-});
+})
 
-router.get("/:id", checkAccountId(), async (req, res, next) => {
+router.post('/', mw.checkAccountPayload, async (req, res, next) => {
+  // DO YOUR MAGIC
   try {
-    const account = await model.getById(req.params.id);
-    res.status(200).json(account);
-  } catch (err) {
+    const newAccount = await db.create(req.body);
+    res.status(201).json(newAccount);
+  }
+  catch(err) {
     next(err);
   }
-});
 
-router.post("/", checkAccountPayload(), async (req, res, next) => {
+})
+
+router.put('/:id',mw.checkAccountPayload, mw.checkAccountId, async (req, res, next) => {
+  // DO YOUR MAGIC
   try {
-    const post = await model.create(req.body);
-    res.status(201).json(post);
-  } catch (err) {
+    const updatedAccount = await db.updateById(req.params.id, req.body);
+    res.status(200).json(updatedAccount);
+  }
+  catch (err) {
     next(err);
   }
 });
 
-router.put("/:id", async (req, res, next) => {
+router.delete('/:id', mw.checkAccountId, async (req, res, next) => {
+  // DO YOUR MAGIC
   try {
-    const update = await model.updateById(req.params.id, req.body);
-    res.status(200).json(update);
-  } catch (err) {
+    const deletedAccount = await db.deleteById(req.params.id);
+    res.status(204).json(deletedAccount);
+  }
+  catch (err) {
     next(err);
   }
-});
+})
 
-router.delete("/:id", checkAccountId(), async (req, res, next) => {
-  try {
-    await model.deleteById(req.params.id);
-    res.status(200).json({ message: "Delete successful" });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.use((err, req, res, next) => {
-  // eslint-disable-line
-  // CALL next(err) IF THE PROMISE REJECTS INSIDE YOUR ENDPOINTS
+router.use((err, req, res, next) => { // eslint-disable-line
+  // DO YOUR MAGIC
   res.status(500).json({
-    message: "something went wrong inside the accounts router",
-    errMessage: err.message,
-  });
-});
+    message: "something went wrong"
+  })
+})
 
 module.exports = router;
